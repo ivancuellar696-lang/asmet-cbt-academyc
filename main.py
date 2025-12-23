@@ -7,30 +7,38 @@ import os
 os.environ['KIVY_GL_BACKEND'] = 'angle_sdl2'
 os.environ['KIVY_WINDOW'] = 'sdl2'
 
-from kivy.app import App
-from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
-from kivy.core.window import Window
+from kivymd.app import MDApp
+from kivymd.uix.button import MDRaisedButton, MDFlatButton, MDRectangleFlatButton
+from kivymd.uix.label import MDLabel
+from kivymd.uix.textfield import MDTextField
+from kivymd.uix.boxlayout import MDBoxLayout
+from kivymd.uix.card import MDCard
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.list import MDList, OneLineListItem
+from kivymd.uix.screen import MDScreen
+from kivymd.uix.screenmanager import MDScreenManager
+from kivymd.uix.toolbar import MDTopAppBar
+
+# Y también mantener algunas de Kivy normal
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
-from kivy.uix.scrollview import ScrollView
-from kivy.uix.image import Image
-from kivy.uix.carousel import Carousel
-from kivy.uix.modalview import ModalView
-from kivy.uix.progressbar import ProgressBar
-from kivy.uix.slider import Slider
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle, RoundedRectangle
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
 from kivy.clock import Clock
-from kivy.animation import Animation
 from kivy.properties import StringProperty, NumericProperty, ListProperty, BooleanProperty
-import json
-import sqlite3
-from datetime import datetime
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.image import Image
 import random
-import math
+import json
+import os
+from datetime import datetime
+import sqlite3
 
 # Configuración de ventana
 Window.size = (400, 700)
@@ -395,14 +403,17 @@ class WelcomeScreen(Screen):
             spacing=15
         )
         
-        start_button = Button(
-            text='COMENZAR APRENDIZAJE',
-            size_hint_y=0.5,
-            background_color=[1, 1, 1, 1],
-            color=[0.13, 0.59, 0.95, 1],
-            font_size=18,
+        start_button = MDRaisedButton(
+            text="COMENZAR",
+            size_hint=(0.8, 0.15),
+            pos_hint={'center_x': 0.5, 'center_y': 0.3},
+            md_bg_color=(0.2, 0.6, 0.9, 1),
+            text_color=(1, 1, 1, 1),
+            font_size='20sp',
+            font_name='assets/fonts/Roboto-Bold.ttf',
             bold=True,
-            border_radius=25
+            radius=[25]
+
         )
         start_button.bind(on_press=self.start_learning)
         
