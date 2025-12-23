@@ -19,12 +19,15 @@ from kivymd.uix.screen import MDScreen
 from kivymd.uix.screenmanager import MDScreenManager
 from kivymd.uix.toolbar import MDTopAppBar
 
-# Y también mantener algunas de Kivy normal
+# Importaciones de Kivy normales
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.modalview import ModalView
+from kivy.uix.slider import Slider
 from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle, RoundedRectangle
 from kivy.uix.scrollview import ScrollView
@@ -48,7 +51,7 @@ class CBTMathDatabase:
     """Base de datos para seguimiento de progreso CBT"""
     
     def __init__(self):
-        self.conn = sqlite3.connect('asmet_cbt_academyc.db')
+        self.conn = sqlite3.connect('asmet_cbt_academyc.db', check_same_thread=False)
         self.create_tables()
     
     def create_tables(self):
@@ -333,13 +336,12 @@ class WelcomeScreen(Screen):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.background_color = [0.13, 0.59, 0.95, 1]
         
         layout = FloatLayout()
         
-        # Fondo decorativo
+        # Fondo con gradiente azul
         with layout.canvas.before:
-            Color(*self.background_color)
+            Color(0.13, 0.59, 0.95, 1)
             Rectangle(pos=layout.pos, size=layout.size)
         
         # Logo principal
@@ -403,27 +405,28 @@ class WelcomeScreen(Screen):
             spacing=15
         )
         
+        # Usar MDRaisedButton para el botón principal
         start_button = MDRaisedButton(
             text="COMENZAR",
-            size_hint=(0.8, 0.15),
-            pos_hint={'center_x': 0.5, 'center_y': 0.3},
+            size_hint=(None, None),
+            size=(300, 50),
+            pos_hint={'center_x': 0.5},
             md_bg_color=(0.2, 0.6, 0.9, 1),
             text_color=(1, 1, 1, 1),
             font_size='20sp',
-            font_name='assets/fonts/Roboto-Bold.ttf',
-            bold=True,
-            radius=[25]
-
+            bold=True
         )
         start_button.bind(on_press=self.start_learning)
         
+        # Botón de características (Kivy normal)
         features_button = Button(
             text='VER CARACTERÍSTICAS',
-            size_hint_y=0.5,
+            size_hint=(None, None),
+            size=(300, 50),
+            pos_hint={'center_x': 0.5},
             background_color=[0.2, 0.6, 0.9, 0.8],
             color=[1, 1, 1, 1],
-            font_size=16,
-            border_radius=20
+            font_size=16
         )
         features_button.bind(on_press=self.show_features)
         
@@ -501,7 +504,6 @@ class StudentRegistrationScreen(Screen):
                 font_size=12,
                 background_color=[0.2, 0.6, 0.9, 0.3] if level == 'basic' else [0.9, 0.9, 0.9, 1],
                 color=[0.2, 0.2, 0.2, 1],
-                border_radius=15,
                 halign='center',
                 valign='middle'
             )
@@ -591,7 +593,7 @@ class StudentRegistrationScreen(Screen):
             return
         
         # Guardar datos del estudiante en la app
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         app.student_data = {
             'name': name,
             'age': age,
@@ -842,8 +844,7 @@ class DashboardScreen(Screen):
                 text=f'{icon}\n{text}',
                 font_size=11,
                 background_color=[0.2, 0.6, 0.9, 0.1] if screen_name == 'dashboard' else [0.9, 0.9, 0.9, 1],
-                color=[0.2, 0.2, 0.2, 1],
-                border_radius=10
+                color=[0.2, 0.2, 0.2, 1]
             )
             nav_btn.bind(on_press=lambda x, scr=screen_name: self.navigate_to(scr))
             nav.add_widget(nav_btn)
@@ -858,7 +859,7 @@ class DashboardScreen(Screen):
         """Actualiza el contenido del dashboard"""
         self.main_content.clear_widgets()
         
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         student_data = getattr(app, 'student_data', {})
         
         # Actualizar header
@@ -964,7 +965,6 @@ class DashboardScreen(Screen):
             height=70,
             background_color=data.get('color', [0.9, 0.9, 0.9, 1]),
             color=[1, 1, 1, 1],
-            border_radius=10,
             background_normal=''
         )
         
@@ -1121,7 +1121,7 @@ class DashboardScreen(Screen):
     
     def start_practice(self, competence_name):
         """Inicia práctica de una competencia"""
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         app.current_competence = competence_name
         self.manager.current = 'practice'
 
@@ -1191,7 +1191,7 @@ class CompetencesScreen(Screen):
     
     def on_pre_enter(self):
         """Carga las competencias al entrar"""
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         level = app.student_data.get('level', 'basic') if hasattr(app, 'student_data') else 'basic'
         self.load_competences(level)
     
@@ -1228,7 +1228,6 @@ class CompetencesScreen(Screen):
             height=200,
             background_color=data.get('color', [0.2, 0.6, 0.9, 1]),
             color=[1, 1, 1, 1],
-            border_radius=20,
             background_normal=''
         )
         
@@ -1297,7 +1296,7 @@ class CompetencesScreen(Screen):
     
     def select_competence(self, competence_name):
         """Selecciona una competencia para practicar"""
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         app.current_competence = competence_name
         self.manager.current = 'practice'
 
@@ -1391,8 +1390,7 @@ class PracticeScreen(Screen):
             size_hint_y=0.15,
             background_color=[1, 1, 1, 1],
             foreground_color=[0.2, 0.2, 0.2, 1],
-            padding=[20, 15],
-            opacity=0
+            padding=[20, 15]
         )
         
         # Botones de acción
@@ -1447,7 +1445,7 @@ class PracticeScreen(Screen):
     
     def on_pre_enter(self):
         """Prepara la práctica al entrar"""
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         self.current_competence = getattr(app, 'current_competence', 'Aritmética Fundamental')
         self.competence_label.text = self.current_competence
         self.correct_count = 0
@@ -1510,8 +1508,7 @@ class PracticeScreen(Screen):
         }
         
         self.question_label.text = question
-        self.numeric_input.opacity = 1
-        self.options_container.opacity = 0
+        self.options_container.clear_widgets()
         self.numeric_input.text = ''
     
     def generate_geometry_exercise(self):
@@ -1540,8 +1537,7 @@ class PracticeScreen(Screen):
         }
         
         self.question_label.text = question
-        self.numeric_input.opacity = 1
-        self.options_container.opacity = 0
+        self.options_container.clear_widgets()
         self.numeric_input.text = ''
     
     def generate_algebra_exercise(self):
@@ -1572,8 +1568,7 @@ class PracticeScreen(Screen):
         }
         
         self.question_label.text = question
-        self.numeric_input.opacity = 0
-        self.options_container.opacity = 1
+        self.numeric_input.text = ''
         
         # Limpiar y llenar opciones
         self.options_container.clear_widgets()
@@ -2211,7 +2206,7 @@ class SettingsScreen(Screen):
             color=[0.2, 0.2, 0.2, 1]
         )
         
-        app = App.get_running_app()
+        app = MDApp.get_running_app()
         student_data = getattr(app, 'student_data', {})
         
         # Información del estudiante
@@ -2563,7 +2558,7 @@ Desarrollado con pasión por la educación matemática.'''
         popup.add_widget(content)
         popup.open()
 
-class ASMETCBTApp(App):
+class ASMETCBTApp(MDApp):
     """Aplicación principal ASMET CBT ACADEMYC"""
     
     def __init__(self, **kwargs):
@@ -2574,6 +2569,9 @@ class ASMETCBTApp(App):
     
     def build(self):
         """Construye la aplicación"""
+        self.theme_cls.primary_palette = "Blue"
+        self.theme_cls.theme_style = "Light"
+        
         sm = ScreenManager(transition=FadeTransition())
         
         # Registrar todas las pantallas
